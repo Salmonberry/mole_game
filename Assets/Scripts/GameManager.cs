@@ -3,6 +3,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
+    [SerializeField]
+    private GameUIManager _gameUIManager;
 
     public static GameManager Instance
     {
@@ -35,5 +37,9 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    // 在此添加游戏管理器的其他方法和属性
+    
+    
+    
+    
+    
 }
