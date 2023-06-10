@@ -1,21 +1,21 @@
-using System;
 using System.Linq;
 using CustomArrayExtensions;
+using GameScene.GamePlayScene;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GamePlayPresenter : MonoBehaviour
 {
     public GameObject gopher;
     private Transform[] _gopherList;
-    private Vector3 _previouHolePosition;
+    private Vector3 _previousHolePosition;
 
-    [Header("Time CuteDown")] 
-    [SerializeField]
+    public GamePlayUI gamePlayUI;
+
+    [Header("Time CuteDown")] [SerializeField]
     public float timeRemaining = 10;
+
     [SerializeField] private bool _timerIsRunning = false;
-    
-    
-    
+
 
     void Start()
     {
@@ -48,18 +48,16 @@ public class GameController : MonoBehaviour
     {
         var currentPosition = data.GetRandom().position;
 
-        if (currentPosition == _previouHolePosition)
+        if (currentPosition == _previousHolePosition)
         {
             currentPosition = data.GetRandom().position;
         }
 
-        _previouHolePosition = currentPosition;
+        _previousHolePosition = currentPosition;
 
 
         return currentPosition;
     }
-    
-    // Unity Game time countdown
-    
 
+    // Unity Game time countdown
 }

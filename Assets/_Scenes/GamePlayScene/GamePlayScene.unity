@@ -287,6 +287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6eb4bd49b0047624da11f781f0b340d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameUIManager: {fileID: 833395491}
 --- !u!4 &47734048
 Transform:
   m_ObjectHideFlags: 0
@@ -1286,6 +1287,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d615b7bcd68efc547bcfa8639c4039ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Score: {fileID: 0}
+  TimeRemaining: {fileID: 0}
+  Opportunity: {fileID: 0}
 --- !u!1 &938755145
 GameObject:
   m_ObjectHideFlags: 0
