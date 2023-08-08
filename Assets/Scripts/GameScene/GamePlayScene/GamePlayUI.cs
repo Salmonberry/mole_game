@@ -1,28 +1,27 @@
 ﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GameScene.GamePlayScene
 {
     public class GamePlayUI : MonoBehaviour, IGamePlayUI
     {
-        public TextMeshProUGUI Score;
-        public TextMeshProUGUI TimeRemaining;
-        public TextMeshProUGUI Opportunity;
+        public TextMeshProUGUI score;
+        public TextMeshProUGUI timeRemaining;
+        public TextMeshProUGUI opportunity;
 
         public void UpdateScore(int score)
         {
-            Score.text = score.ToString();
+            this.score.text = $"Score:{score.ToString()}";
         }
 
         public void UpdateTimeRemaining(int timeRemaining)
         {
-            TimeRemaining.text = timeRemaining.ToString();
+            this.timeRemaining.text = $"Time Remaining:{timeRemaining.ToString()}";
         }
 
         public void UpdateOpportunity(int opportunity)
         {
-            Opportunity.text = opportunity.ToString();
+            this.opportunity.text = $"Opportunity:{opportunity.ToString()}";
         }
     }
 }
