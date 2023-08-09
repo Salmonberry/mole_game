@@ -44,13 +44,10 @@ public class GamePlayPresenter : MonoBehaviour
         GameEndEvent.Register(ShowGameEndPanel);
         GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
 
-        var gameModelManager = GameObject.FindObjectOfType<GameModelManager>();
-        playerData = gameModelManager.LoadData("PlayerData");
-        
-        
+        GetGameModelData();
+
         var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
-
-
+        
         playButton.GetComponent<Button>().onClick.AddListener((() =>
         {
             var gameStartPanel = playButton.transform.parent.gameObject;
@@ -59,6 +56,12 @@ public class GamePlayPresenter : MonoBehaviour
             GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
             InvokeRepeating(nameof(GenerateGopher), 0, 3);
         }));
+    }
+
+    private void GetGameModelData()
+    {
+        var gameModelManager = GameObject.FindObjectOfType<GameModelManager>();
+        playerData = gameModelManager.LoadData("PlayerData");
     }
 
     private void OnDestroy()
