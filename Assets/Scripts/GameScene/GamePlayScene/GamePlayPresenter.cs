@@ -44,8 +44,6 @@ public class GamePlayPresenter : MonoBehaviour
         GameEndEvent.Register(ShowGameEndPanel);
         GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
 
-        // title.transform.DOScale(Vector3.one * 0.9f, 2f).From().SetEase(Ease.InOutBack).SetLoops(-1, LoopType.Yoyo);
-
         var gameModelManager = GameObject.FindObjectOfType<GameModelManager>();
         playerData = gameModelManager.LoadData("PlayerData");
         
@@ -78,15 +76,6 @@ public class GamePlayPresenter : MonoBehaviour
         return (from child in children where child.name == childName select child.gameObject).FirstOrDefault();
     }
 
-    private void Update()
-    {
-        if (GameSystem.Instance.GameState==GameState.GamePlaying)
-        {
-            UpdateRemaining();
-        }
-    }
-
-
     void UpdateScore(int data)
     {
         playerData.UpdateScore(data);
@@ -97,20 +86,6 @@ public class GamePlayPresenter : MonoBehaviour
     {
         playerData.UpdateOpportunity(1);
         gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-    }
-
-    void UpdateRemaining()
-    {
-        timeRemaining -= Time.deltaTime;
-
-        if (timeRemaining <= 0f)
-        {
-            timeRemaining = 0;
-            GameSystem.Instance.UpdateGameState(GameState.GameOver);
-            CancelInvoke();
-        }
-
-        gamePlayUI.UpdateTimeRemaining((int) timeRemaining);
     }
 
     private IEnumerator CountDownTimeRemaining()

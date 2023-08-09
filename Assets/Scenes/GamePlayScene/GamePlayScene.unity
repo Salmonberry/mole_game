@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1211, y: -70}
+  m_AnchoredPosition: {x: 1213, y: -70}
   m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &40767636
@@ -1067,6 +1067,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultCursorTexture: {fileID: 2800000, guid: 967d3bb299f9abd43b6614fbaeffb0cd, type: 3}
   cursorClickedTexture: {fileID: 2800000, guid: 2f2d8512a77d5e147b3dc02f98a3dd5d, type: 3}
+  buttonVoiceEffect: {fileID: 8300000, guid: 7a4c4b5d7ffae4646b53e27c39ffc487, type: 3}
+  audioSource: {fileID: 0}
 --- !u!4 &507069223
 Transform:
   m_ObjectHideFlags: 0
@@ -1270,7 +1272,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 596.4, y: -70}
+  m_AnchoredPosition: {x: 636, y: -70}
   m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &537401554
@@ -1293,7 +1295,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Time Remaining:0
+  m_text: Time Remaining:60
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -1356,7 +1358,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -134.14725, w: 0}
+  m_margin: {x: 0, y: 0, z: -28.94278, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1769,7 +1771,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 132.89996, y: -70}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 222.83, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &655856741
 MonoBehaviour:
@@ -1854,7 +1856,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -93.34758, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2473,6 +2475,53 @@ Transform:
   m_Father: {fileID: 1488624613}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1156466478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1156466480}
+  - component: {fileID: 1156466479}
+  m_Layer: 0
+  m_Name: GameModelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1156466479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156466478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21b5410652ce49819c63645fb48e20d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    _score: 0
+    _opportunity: 3
+--- !u!4 &1156466480
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156466478}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0076045245, y: -0.04921967, z: 59.019264}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1284782935
 GameObject:
   m_ObjectHideFlags: 0
@@ -2980,12 +3029,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gopher: {fileID: 3279412837902103327, guid: cac549b13f42cd6478af759fe450ee2f, type: 3}
   explosion: {fileID: 8574727582542113695, guid: 083632c639ef2db4f83f30b2b8d608d1, type: 3}
-  buttonVoiceEffect: {fileID: 8300000, guid: 7a4c4b5d7ffae4646b53e27c39ffc487, type: 3}
   gameStartReadyVoiceEffect: {fileID: 8300000, guid: d616eb9dd5ba66042a62f079596b6cd0, type: 3}
   audioSource: {fileID: 0}
   gameEndPanel: {fileID: 1284782935}
   gamePlayUI: {fileID: 833395491}
   timeRemaining: 60
+  playerData:
+    _score: 0
+    _opportunity: 3
 --- !u!82 &1488624615
 AudioSource:
   m_ObjectHideFlags: 0
