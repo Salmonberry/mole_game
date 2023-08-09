@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Linq;
 using CustomArrayExtensions;
@@ -6,20 +5,22 @@ using Domin.Enitiy;
 using Domin.Event;
 using GameScene.GamePlayScene;
 using Model;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class GamePlayPresenter : MonoBehaviour
 {
-    public GameObject gopher;
+    public GameObject gopherPrefab;
     private Transform[] _gopherList;
     private Vector3 _previousHolePosition;
+    private GameObject _gopher;
 
     [Header("VFX")] public GameObject explosion;
 
-    [Header("Sound Configure")] 
-    public AudioClip gameStartReadyVoiceEffect;
+    [Header("Sound Configure")] public AudioClip gameStartReadyVoiceEffect;
     public AudioSource audioSource;
 
     [Header("Game UI")] public GameObject gameEndPanel;
@@ -39,14 +40,14 @@ public class GamePlayPresenter : MonoBehaviour
     void Start()
     {
         InitData();
-        
+
         var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
-        
+
         playButton.GetComponent<Button>().onClick.AddListener((() =>
         {
             var gameStartPanel = playButton.transform.parent.gameObject;
             gameStartPanel.SetActive(false);
-            
+
             GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
             InvokeRepeating(nameof(GenerateGopher), 0, 3);
         }));
@@ -55,22 +56,22 @@ public class GamePlayPresenter : MonoBehaviour
     void InitData()
     {
         _gopherList = GenerateHoles();
-        playerData= GetGameModelData();
-        
+        playerData = GetGameModelData();
+
         gamePlayUI.UpdateScore(playerData.GetScore());
         gamePlayUI.UpdateTimeRemaining(60);
         gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-        
+
         ScoreCalculationEvent.Register(UpdateScore);
         GameStartReadyEvent.Register(ShowGameReadyMusic);
         GameEndEvent.Register(ShowGameEndPanel);
         GameOpportunityEvent.Register(UpdateOpportunity);
-        GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
+        GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
     }
 
     private PlayerData GetGameModelData()
     {
-        var gameModelManager = GameObject.FindObjectOfType<GameModelManager>();
+        var gameModelManager = FindObjectOfType<GameModelManager>();
         return gameModelManager.LoadData("PlayerData");
     }
 
@@ -79,7 +80,7 @@ public class GamePlayPresenter : MonoBehaviour
         ScoreCalculationEvent.Unregister(UpdateScore);
         GameStartReadyEvent.Unregister(ShowGameReadyMusic);
         GameEndEvent.Unregister(ShowGameEndPanel);
-        GamePlayingEvent.Unregister(()=>StartCoroutine(CountDownTimeRemaining()));
+        GamePlayingEvent.Unregister(() => StartCoroutine(CountDownTimeRemaining()));
     }
 
     private GameObject GetChildByName(GameObject parent, string childName)
@@ -103,17 +104,18 @@ public class GamePlayPresenter : MonoBehaviour
 
     private IEnumerator CountDownTimeRemaining()
     {
-        while (timeRemaining>0)
+        while (timeRemaining > 0)
         {
             yield return new WaitForSeconds(1);
             timeRemaining--;
-            
+
             gamePlayUI.UpdateTimeRemaining((int) timeRemaining);
         }
-        
-        timeRemaining = 0;
+
+        CancelInvoke();
+
         GameSystem.Instance.UpdateGameState(GameState.GameOver);
-        CancelInvoke(); 
+        _gopher.GetComponent<Gopher>().UnenabledTapped();
     }
 
     public void GenerateGopher()
@@ -121,7 +123,7 @@ public class GamePlayPresenter : MonoBehaviour
         Vector3 randomPosition = GetRandomPosition(_gopherList);
         randomPosition.y += 0.5f;
 
-        Instantiate(gopher, randomPosition, Quaternion.identity);
+        _gopher = Instantiate(gopherPrefab, randomPosition, Quaternion.identity);
     }
 
     private Transform[] GenerateHoles()
@@ -185,7 +187,7 @@ public class GamePlayPresenter : MonoBehaviour
     public void ExitGame()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif
