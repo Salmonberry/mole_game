@@ -26,7 +26,7 @@ public class GamePlayPresenter : MonoBehaviour
     public GamePlayUI gamePlayUI;
 
     [Header("Time CuteDown")] [SerializeField]
-    public float timeRemaining = 11f;
+    public float timeRemaining = 60f;
 
     [Header("Player Data")] [SerializeField]
     public PlayerData playerData;
@@ -38,14 +38,8 @@ public class GamePlayPresenter : MonoBehaviour
 
     void Start()
     {
-        _gopherList = GenerateHoles();
-        ScoreCalculationEvent.Register(UpdateScore);
-        GameStartReadyEvent.Register(ShowGameReadyMusic);
-        GameEndEvent.Register(ShowGameEndPanel);
-        GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
-
-        GetGameModelData();
-
+        InitData();
+        
         var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
         
         playButton.GetComponent<Button>().onClick.AddListener((() =>
@@ -58,10 +52,25 @@ public class GamePlayPresenter : MonoBehaviour
         }));
     }
 
-    private void GetGameModelData()
+    void InitData()
+    {
+        _gopherList = GenerateHoles();
+        playerData= GetGameModelData();
+        
+        gamePlayUI.UpdateScore(playerData.GetScore());
+        gamePlayUI.UpdateTimeRemaining(60);
+        gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
+        
+        ScoreCalculationEvent.Register(UpdateScore);
+        GameStartReadyEvent.Register(ShowGameReadyMusic);
+        GameEndEvent.Register(ShowGameEndPanel);
+        GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
+    }
+
+    private PlayerData GetGameModelData()
     {
         var gameModelManager = GameObject.FindObjectOfType<GameModelManager>();
-        playerData = gameModelManager.LoadData("PlayerData");
+        return gameModelManager.LoadData("PlayerData");
     }
 
     private void OnDestroy()
