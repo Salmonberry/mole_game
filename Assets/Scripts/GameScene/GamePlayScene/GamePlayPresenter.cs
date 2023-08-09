@@ -64,6 +64,7 @@ public class GamePlayPresenter : MonoBehaviour
         ScoreCalculationEvent.Register(UpdateScore);
         GameStartReadyEvent.Register(ShowGameReadyMusic);
         GameEndEvent.Register(ShowGameEndPanel);
+        GameOpportunityEvent.Register(UpdateOpportunity);
         GamePlayingEvent.Register(()=>StartCoroutine(CountDownTimeRemaining()));
     }
 
@@ -94,7 +95,7 @@ public class GamePlayPresenter : MonoBehaviour
         gamePlayUI.UpdateScore(playerData.GetScore());
     }
 
-    void UpdateOpportUnity()
+    void UpdateOpportunity()
     {
         playerData.UpdateOpportunity(1);
         gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
