@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domin.Enitiy;
 using UnityEngine;
 
 namespace Model
 {
+    [Serializable]
     public class GameModelManager : MonoBehaviour
     {
         public PlayerData playerData;
@@ -23,9 +26,6 @@ namespace Model
             }
         }
 
-        public void SaveData(String key, PlayerData value)
-        {
-            PlayerPrefs.SetString(key, JsonUtility.ToJson(value));
-        }
+        public void SaveData(Dictionary<String,PlayerData> data) => PlayerPrefs.SetString(data.First().Key, JsonUtility.ToJson(data.First().Value));
     }
 }

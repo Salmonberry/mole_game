@@ -51,14 +51,12 @@ public class GameSystem : MonoBehaviour
     {
         UpdateGameState(GameState.GameReady);
     }
-    
-    
-    
+
 
     public void UpdateGameState(GameState state)
     {
         GameState = state;
-
+        
         switch (state)
         {
             case GameState.GameReady:
@@ -67,6 +65,7 @@ public class GameSystem : MonoBehaviour
                 GamePlayingEvent.Trigger();
                 break;
             case GameState.GamePause:
+                GamePauseEvent.Trigger();
                 break;
             case GameState.GameOver:
                 GameEndEvent.Trigger();

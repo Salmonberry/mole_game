@@ -17,12 +17,16 @@ public class Gopher : MonoBehaviour
 
     private void Update()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= existTime)
+        if (GameSystem.Instance.GameState==GameState.GamePlaying)
         {
-            Destroy(gameObject);
+            timer += Time.deltaTime;
+
+            if (timer >= existTime)
+            {
+                Destroy(gameObject);
+            }    
         }
+        
     }
 
     public void UnenabledTapped()
@@ -34,4 +38,16 @@ public class Gopher : MonoBehaviour
             collider.enabled = false;
         }
     }
+    
+    public void enabledTapped()
+    {
+        var collider = gameObject.GetComponent<BoxCollider2D>();
+
+        if (collider != null)
+        {
+            collider.enabled = true;
+        }
+    }
+    
+    
 }

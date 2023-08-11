@@ -1,200 +1,239 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using CustomArrayExtensions;
 using Domin.Enitiy;
 using Domin.Event;
-using GameScene.GamePlayScene;
 using Model;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class GamePlayPresenter : MonoBehaviour
+namespace GameScene.GamePlayScene
 {
-    public GameObject gopherPrefab;
-    private Transform[] _gopherList;
-    private Vector3 _previousHolePosition;
-    private GameObject _gopher;
-
-    [Header("VFX")] public GameObject explosion;
-
-    [Header("Sound Configure")] public AudioClip gameStartReadyVoiceEffect;
-    public AudioSource audioSource;
-
-    [Header("Game UI")] public GameObject gameEndPanel;
-    public GamePlayUI gamePlayUI;
-
-    [Header("Time CuteDown")] [SerializeField]
-    public float timeRemaining = 60f;
-
-    [Header("Player Data")] [SerializeField]
-    public PlayerData playerData;
-
-    private void Awake()
+    public class GamePlayPresenter : MonoBehaviour
     {
-        audioSource = GetComponent<AudioSource>();
-    }
+        [Header("VFX")] public GameObject explosion;
+        [Header("Sound Configure")] public AudioClip gameStartReadyVoiceEffect;
+        public AudioSource audioSource;
+        [Header("Game UI")] public GameObject gameEndPanel;
+        public GamePlayUI gamePlayUI;
+        [Header("Time CuteDown")] public float timeRemaining = 60f;
+        [Header("Player Data")] public PlayerData playerData;
+        [Header("Game Model Manager")] public GameModelManager gameModelManager;
+        
+        public GameObject gopherPrefab;
+        private Transform[] _gopherList;
+        private Vector3 _previousHolePosition;
+        private GameObject _gopher;
+        private float _timer;
 
-    void Start()
-    {
-        InitData();
-
-        var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
-
-        playButton.GetComponent<Button>().onClick.AddListener((() =>
+        private void Awake()
         {
-            var gameStartPanel = playButton.transform.parent.gameObject;
-            gameStartPanel.SetActive(false);
-
-            GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
-            InvokeRepeating(nameof(GenerateGopher), 0, 3);
-        }));
-    }
-
-    void InitData()
-    {
-        _gopherList = GenerateHoles();
-        playerData = GetGameModelData();
-
-        gamePlayUI.UpdateScore(playerData.GetScore());
-        gamePlayUI.UpdateTimeRemaining(60);
-        gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-
-        ScoreCalculationEvent.Register(UpdateScore);
-        GameStartReadyEvent.Register(ShowGameReadyMusic);
-        GameEndEvent.Register(ShowGameEndPanel);
-        GameOpportunityEvent.Register(UpdateOpportunity);
-        GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
-    }
-
-    private PlayerData GetGameModelData()
-    {
-        var gameModelManager = FindObjectOfType<GameModelManager>();
-        return gameModelManager.LoadData("PlayerData");
-    }
-
-    private void OnDestroy()
-    {
-        ScoreCalculationEvent.Unregister(UpdateScore);
-        GameStartReadyEvent.Unregister(ShowGameReadyMusic);
-        GameEndEvent.Unregister(ShowGameEndPanel);
-        GamePlayingEvent.Unregister(() => StartCoroutine(CountDownTimeRemaining()));
-    }
-
-    private GameObject GetChildByName(GameObject parent, string childName)
-    {
-        var children = parent.transform.parent.GetComponentsInChildren<Transform>();
-
-        return (from child in children where child.name == childName select child.gameObject).FirstOrDefault();
-    }
-
-    void UpdateScore(int data)
-    {
-        playerData.UpdateScore(data);
-        gamePlayUI.UpdateScore(playerData.GetScore());
-    }
-
-    void UpdateOpportunity()
-    {
-        playerData.UpdateOpportunity(1);
-        gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-    }
-
-    private IEnumerator CountDownTimeRemaining()
-    {
-        while (timeRemaining > 0)
-        {
-            yield return new WaitForSeconds(1);
-            timeRemaining--;
-
-            gamePlayUI.UpdateTimeRemaining((int) timeRemaining);
+            audioSource = GetComponent<AudioSource>();
         }
 
-        CancelInvoke();
-
-        GameSystem.Instance.UpdateGameState(GameState.GameOver);
-        _gopher.GetComponent<Gopher>().UnenabledTapped();
-    }
-
-    public void GenerateGopher()
-    {
-        Vector3 randomPosition = GetRandomPosition(_gopherList);
-        randomPosition.y += 0.5f;
-
-        _gopher = Instantiate(gopherPrefab, randomPosition, Quaternion.identity);
-    }
-
-    private Transform[] GenerateHoles()
-    {
-        var holes = new Transform[] { };
-
-        var parent = GameObject.Find("Holes");
-
-        return parent == null
-            ? holes
-            : parent.transform.Cast<Transform>().Aggregate(holes, (current, child) => current.Append(child).ToArray());
-    }
-
-    private Vector3 GetRandomPosition(Transform[] data)
-    {
-        var currentPosition = data.GetRandom().position;
-
-        if (currentPosition == _previousHolePosition)
+        void Start()
         {
-            currentPosition = data.GetRandom().position;
+            InitData();
+
+            var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
+
+            playButton.GetComponent<Button>().onClick.AddListener((() =>
+            {
+                var gameStartPanel = playButton.transform.parent.gameObject;
+                gameStartPanel.SetActive(false);
+
+                GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
+                InvokeRepeating(nameof(GenerateGopher), 0, 3);
+            }));
         }
 
-        _previousHolePosition = currentPosition;
-
-
-        return currentPosition;
-    }
-
-    private void ShowGameReadyMusic()
-    {
-        audioSource.clip = gameStartReadyVoiceEffect;
-        audioSource.loop = true;
-        audioSource.Play();
-
-        var vfx = new GameObject
+        void InitData()
         {
-            name = "VFX"
-        };
+            try
+            {
+                _gopherList = GenerateHoles();
+                playerData = GetGameModelData();
+                _timer = timeRemaining;
 
-        var rainVFX = Instantiate(explosion, explosion.transform.position, Quaternion.identity);
-        rainVFX.GetComponent<ParticleSystem>().Play();
+                gamePlayUI.UpdateScore(playerData.GetScore());
+                gamePlayUI.UpdateTimeRemaining((int)_timer);
+                gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
 
-        rainVFX.transform.parent = vfx.transform;
-    }
+                ScoreCalculationEvent.Register(UpdateScore);
+                GameStartReadyEvent.Register(ShowGameReadyMusic);
+                // GameEndEvent.Register();
+                GameOpportunityEvent.Register(UpdateOpportunity);
+                GamePauseEvent.Register(ShowGameEndPanel);
+                GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
-    private void ShowGameEndPanel()
-    {
-        gameEndPanel.SetActive(true);
-        var exitButton = GetChildByName(gameEndPanel, "Button_Exit");
-        var restartButton = GetChildByName(gameEndPanel, "Button_Restart");
+        private PlayerData GetGameModelData()
+        {
+            gameModelManager = FindObjectOfType<GameModelManager>();
 
-        print(exitButton);
-        print(restartButton);
+            return gameModelManager.LoadData("PlayerData");
+        }
 
-        exitButton.GetComponent<Button>().onClick.AddListener(ExitGame);
-        restartButton.GetComponent<Button>().onClick.AddListener(RestartGame);
-    }
+        private void OnDestroy()
+        {
+            ScoreCalculationEvent.Unregister(UpdateScore);
+            GameStartReadyEvent.Unregister(ShowGameReadyMusic);
+            GameEndEvent.Unregister(ShowGameEndPanel);
+            GamePlayingEvent.Unregister(() => StartCoroutine(CountDownTimeRemaining()));
+        }
+
+        private GameObject GetChildByName(GameObject parent, string childName)
+        {
+            var children = parent.transform.parent.GetComponentsInChildren<Transform>();
+
+            return (from child in children where child.name == childName select child.gameObject).FirstOrDefault();
+        }
+
+        void UpdateScore(int data)
+        {
+            playerData.UpdateScore(data);
+            gamePlayUI.UpdateScore(playerData.GetScore());
+        }
+
+        void UpdateOpportunity()
+        {
+            playerData.UpdateOpportunity(1);
+            gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
+        }
+
+        private IEnumerator CountDownTimeRemaining()
+        {
+            while (_timer > 0)
+            {
+                yield return new WaitForSeconds(1);
+                --_timer;
+
+                gamePlayUI.UpdateTimeRemaining((int) _timer);
+            }
+
+            CancelInvoke();
+
+            GameSystem.Instance.UpdateGameState(GameState.GamePause);
+            _timer = 0;
+            
+            if (_gopher!=null)
+            {
+                _gopher.GetComponent<Gopher>().UnenabledTapped();    
+            }
+        }
+
+        public void GenerateGopher()
+        {
+            Vector3 randomPosition = GetRandomPosition(_gopherList);
+            randomPosition.y += 0.5f;
+
+            if (_gopher==null)
+            {
+                _gopher=Instantiate(gopherPrefab, randomPosition, Quaternion.identity); 
+            }
+        }
+
+        private Transform[] GenerateHoles()
+        {
+            var holes = new Transform[] { };
+
+            var parent = GameObject.Find("Holes");
+
+            return parent == null
+                ? holes
+                : parent.transform.Cast<Transform>()
+                    .Aggregate(holes, (current, child) => current.Append(child).ToArray());
+        }
+
+        private Vector3 GetRandomPosition(Transform[] data)
+        {
+            var currentPosition = data.GetRandom().position;
+
+            if (currentPosition == _previousHolePosition)
+            {
+                currentPosition = data.GetRandom().position;
+            }
+
+            _previousHolePosition = currentPosition;
+
+            return currentPosition;
+        }
+
+        private void ShowGameReadyMusic()
+        {
+            audioSource.clip = gameStartReadyVoiceEffect;
+            audioSource.loop = true;
+            audioSource.Play();
+
+            var vfx = new GameObject
+            {
+                name = "VFX"
+            };
+
+            var rainVFX = Instantiate(explosion, explosion.transform.position, Quaternion.identity);
+            rainVFX.GetComponent<ParticleSystem>().Play();
+
+            rainVFX.transform.parent = vfx.transform;
+        }
+
+        private void ShowGameEndPanel()
+        {
+            gameEndPanel.SetActive(true);
+
+            var exitButton = GetChildByName(gameEndPanel, "Button_Exit");
+            var continueButton = GetChildByName(gameEndPanel, "Button_Continue");
+
+            print(continueButton);
+
+            exitButton.GetComponent<Button>().onClick.AddListener(ExitGame);
+            continueButton.GetComponent<Button>().onClick.AddListener(ContinueGame);
+        }
+
+        private void HideGameEndPanel()
+        {
+            gameEndPanel.SetActive(false);
+        }
 
 
-    // exit the game
-    public void ExitGame()
-    {
+        // exit the game
+        private void ExitGame()
+        {
 #if UNITY_EDITOR
-        EditorApplication.isPlaying = false;
+            EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif
-    }
+        }
 
-    public void RestartGame()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        private void ContinueGame()
+        {
+            GameOpportunityEvent.Trigger();
+            
+            Dictionary<string, PlayerData> dictionary = new Dictionary<string, PlayerData> {{"PlayerData", playerData}};
+            gameModelManager.SaveData(dictionary);
+
+            HideGameEndPanel();
+            
+            _timer=timeRemaining;
+            StopAllCoroutines();
+            GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
+         
+            InvokeRepeating(nameof(GenerateGopher), 0, 3);
+            
+            if (_gopher!=null)
+            {
+                _gopher.GetComponent<Gopher>().enabledTapped();    
+            }
+        }
     }
 }
