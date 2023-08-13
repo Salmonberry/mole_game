@@ -8,7 +8,7 @@ using Domin.Event;
 using Model;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace GameScene.GamePlayScene
@@ -18,12 +18,13 @@ namespace GameScene.GamePlayScene
         [Header("VFX")] public GameObject explosion;
         [Header("Sound Configure")] public AudioClip gameStartReadyVoiceEffect;
         public AudioSource audioSource;
-        [Header("Game UI")] public GameObject gameEndPanel;
-        public GamePlayUI gamePlayUI;
+        [Header("Game Tips Panel")] public GameObject gameTipsPanel;
+        [Header("Game End Panel")] public GameObject gameEndPanel;
         [Header("Time CuteDown")] public float timeRemaining = 60f;
         [Header("Player Data")] public PlayerData playerData;
-        [Header("Game Model Manager")] public GameModelManager gameModelManager;
-        
+        [Header("Game Play UI")] public GamePlayUI gamePlayUI;
+        [Header("Game Model Manager")] private GameModelManager gameModelManager;
+
         public GameObject gopherPrefab;
         private Transform[] _gopherList;
         private Vector3 _previousHolePosition;
@@ -38,17 +39,7 @@ namespace GameScene.GamePlayScene
         void Start()
         {
             InitData();
-
-            var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
-
-            playButton.GetComponent<Button>().onClick.AddListener((() =>
-            {
-                var gameStartPanel = playButton.transform.parent.gameObject;
-                gameStartPanel.SetActive(false);
-
-                GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
-                InvokeRepeating(nameof(GenerateGopher), 0, 3);
-            }));
+            BindUI();
         }
 
         void InitData()
@@ -58,23 +49,37 @@ namespace GameScene.GamePlayScene
                 _gopherList = GenerateHoles();
                 playerData = GetGameModelData();
                 _timer = timeRemaining;
-
-                gamePlayUI.UpdateScore(playerData.GetScore());
-                gamePlayUI.UpdateTimeRemaining((int)_timer);
-                gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-
-                ScoreCalculationEvent.Register(UpdateScore);
-                GameStartReadyEvent.Register(ShowGameReadyMusic);
-                // GameEndEvent.Register();
-                GameOpportunityEvent.Register(UpdateOpportunity);
-                GamePauseEvent.Register(ShowGameEndPanel);
-                GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        private void BindUI()
+        {
+            gamePlayUI.UpdateScore(playerData.GetScore());
+            gamePlayUI.UpdateTimeRemaining((int) _timer);
+            gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
+
+            ScoreCalculationEvent.Register(UpdateScore);
+            GameStartReadyEvent.Register(ShowGameReadyMusic);
+            // GameEndEvent.Register();
+            GameOpportunityEvent.Register(UpdateOpportunity);
+            GamePauseEvent.Register(ShowGameTipsPanel);
+            GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
+
+            var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
+
+            playButton.GetComponent<Button>().onClick.AddListener((() =>
+            {
+                var gameStartPanel = playButton.transform.parent.gameObject;
+                gameStartPanel.SetActive(false);
+
+                GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
+                InvokeRepeating(nameof(GenerateGopher), 0, 0.5f);
+            }));
         }
 
         private PlayerData GetGameModelData()
@@ -88,7 +93,7 @@ namespace GameScene.GamePlayScene
         {
             ScoreCalculationEvent.Unregister(UpdateScore);
             GameStartReadyEvent.Unregister(ShowGameReadyMusic);
-            GameEndEvent.Unregister(ShowGameEndPanel);
+            GameEndEvent.Unregister(ShowGameTipsPanel);
             GamePlayingEvent.Unregister(() => StartCoroutine(CountDownTimeRemaining()));
         }
 
@@ -123,12 +128,20 @@ namespace GameScene.GamePlayScene
 
             CancelInvoke();
 
-            GameSystem.Instance.UpdateGameState(GameState.GamePause);
-            _timer = 0;
-            
-            if (_gopher!=null)
+            if (playerData.GetOpportunity() <= 0)
             {
-                _gopher.GetComponent<Gopher>().UnenabledTapped();    
+                ShowGameEndPanel();
+            }
+            else
+            {
+                GameSystem.Instance.UpdateGameState(GameState.GamePause);
+            }
+
+            _timer = 0;
+
+            if (_gopher != null)
+            {
+                _gopher.GetComponent<Gopher>().UnenabledTapped();
             }
         }
 
@@ -137,9 +150,9 @@ namespace GameScene.GamePlayScene
             Vector3 randomPosition = GetRandomPosition(_gopherList);
             randomPosition.y += 0.5f;
 
-            if (_gopher==null)
+            if (_gopher == null)
             {
-                _gopher=Instantiate(gopherPrefab, randomPosition, Quaternion.identity); 
+                _gopher = Instantiate(gopherPrefab, randomPosition, Quaternion.identity);
             }
         }
 
@@ -186,28 +199,43 @@ namespace GameScene.GamePlayScene
             rainVFX.transform.parent = vfx.transform;
         }
 
-        private void ShowGameEndPanel()
+        private void ShowGameTipsPanel()
         {
-            gameEndPanel.SetActive(true);
+            gameTipsPanel.SetActive(true);
 
-            var exitButton = GetChildByName(gameEndPanel, "Button_Exit");
-            var continueButton = GetChildByName(gameEndPanel, "Button_Continue");
+            var exitButton = GetChildByName(gameTipsPanel, "Button_Exit");
+            var continueButton = GetChildByName(gameTipsPanel, "Button_Continue");
 
-            print(continueButton);
 
             exitButton.GetComponent<Button>().onClick.AddListener(ExitGame);
             continueButton.GetComponent<Button>().onClick.AddListener(ContinueGame);
         }
 
+        private void ShowGameEndPanel()
+        {
+            gameEndPanel.SetActive(true);
+
+            var exitButton = GetChildByName(gameTipsPanel, "Button_Exit");
+
+            exitButton.GetComponent<Button>().onClick.AddListener(ExitGame);
+        }
+
         private void HideGameEndPanel()
         {
-            gameEndPanel.SetActive(false);
+            var exitButton = GetChildByName(gameTipsPanel, "Button_Exit");
+            var continueButton = GetChildByName(gameTipsPanel, "Button_Continue");
+
+            exitButton.GetComponent<Button>().onClick.RemoveListener(ExitGame);
+            continueButton.GetComponent<Button>().onClick.RemoveListener(ContinueGame);
+
+            gameTipsPanel.SetActive(false);
         }
 
 
         // exit the game
         private void ExitGame()
         {
+            SaveData();
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #else
@@ -218,22 +246,27 @@ namespace GameScene.GamePlayScene
         private void ContinueGame()
         {
             GameOpportunityEvent.Trigger();
-            
-            Dictionary<string, PlayerData> dictionary = new Dictionary<string, PlayerData> {{"PlayerData", playerData}};
-            gameModelManager.SaveData(dictionary);
+
+            SaveData();
 
             HideGameEndPanel();
-            
-            _timer=timeRemaining;
+
+            _timer = timeRemaining;
             StopAllCoroutines();
             GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
-         
+
             InvokeRepeating(nameof(GenerateGopher), 0, 3);
-            
-            if (_gopher!=null)
+
+            if (_gopher != null)
             {
-                _gopher.GetComponent<Gopher>().enabledTapped();    
+                _gopher.GetComponent<Gopher>().enabledTapped();
             }
+        }
+
+        private void SaveData()
+        {
+            Dictionary<string, PlayerData> dictionary = new Dictionary<string, PlayerData> {{"PlayerData", playerData}};
+            gameModelManager.SaveData(dictionary);
         }
     }
 }
