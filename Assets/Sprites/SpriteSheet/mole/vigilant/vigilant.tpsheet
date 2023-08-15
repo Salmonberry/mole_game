@@ -1,0 +1,16 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# https://www.codeandweb.com/texturepacker/unity
+#
+# $TexturePacker:SmartUpdate:3434000e8e421efac4e2a1046ed0e92c:ce84d01c77749281682696c52e8852cb:3f734749b8a18f3b14065bb518b391da$
+#
+:format=40300
+:texture=vigilant.png
+:size=512x512
+:pivotpoints=enabled
+:borders=disabled
+:alphahandling=ClearTransparentPixels
+
+vigilant0001;1;195;333;316; 0.5285285285285285;0.615506329113924; 0;0;0;0; 18;148;266;192;270;227;307;273;306;299;273;305;216;256;185;333;129;333;50;267;0;69;0;11;45;0;118;59;177;13;223;12;261;33;297;66;316; 16;0;16;17;15;13;14;15;16;0;11;12;13;10;11;13;6;9;10;9;6;7;6;10;13;9;7;8;0;6;13;4;5;6;2;3;4;1;4;6;2;4;1;0;1;6;15;0;13

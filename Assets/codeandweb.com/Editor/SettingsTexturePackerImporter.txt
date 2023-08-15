@@ -1,0 +1,23 @@
+version: 2
+tpsheetFileNames:
+- Assets/codeandweb.com/Example/SpriteSheet/sprites.tpsheet
+- Assets/Sprites/mole_idle.tpsheet
+- Assets/Sprites/SpriteSheet/mole/hide/hide.tpsheet
+- Assets/Sprites/SpriteSheet/mole/hurt/hurt.tpsheet
+- Assets/Sprites/SpriteSheet/mole/idle/idle.tpsheet
+- Assets/Sprites/SpriteSheet/mole/vigilant/vigilant.tpsheet
+textureFileNames:
+- Assets/codeandweb.com/Example/SpriteSheet/sprites.png
+- Assets/Sprites/mole_idle.png
+- Assets/Sprites/SpriteSheet/mole/hide/hide.png
+- Assets/Sprites/SpriteSheet/mole/hurt/hurt.png
+- Assets/Sprites/SpriteSheet/mole/idle/idle.png
+- Assets/Sprites/SpriteSheet/mole/vigilant/vigilant.png
+normalmapFileNames:
+- Assets/codeandweb.com/Example/SpriteSheet/sprites_n.png
+- 
+- 
+- 
+- 
+- 
+enableDebugOutput: 0

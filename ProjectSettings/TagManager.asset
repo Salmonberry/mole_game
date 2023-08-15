@@ -44,3 +44,6 @@ TagManager:
   - name: FX
     uniqueID: 2979804437
     locked: 0
+  - name: Enemy
+    uniqueID: 1881926975
+    locked: 0
