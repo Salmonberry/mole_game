@@ -28,9 +28,6 @@ namespace GameScene.GamePlayScene
         [Header("Game Model Manager")] private GameModelManager _gameModelManager;
         [Header("Gopher Prefab")] public GameObject gopherPrefab;
 
-        // [SerializeField] private List<Transform> _holeList;
-        // [SerializeField] private List<Transform> _templeHolePositionList;
-
         private HoleManager _holeManager;
 
         private float _timer;
@@ -44,7 +41,6 @@ namespace GameScene.GamePlayScene
         private void Start()
         {
             InitData();
-            BindUI();
         }
 
         private void InitData()
@@ -56,6 +52,31 @@ namespace GameScene.GamePlayScene
                 _timer = timeRemaining;
                 _gopherPool = new ObjectPool<GopherController>();
                 _gopherPool.InitPool(gopherPrefab);
+
+                ScoreCalculationEvent.Register(UpdateScore);
+                GameStartReadyEvent.Register(ShowGameReadyMusic);
+                GameOpportunityEvent.Register(UpdateOpportunity);
+                GamePauseEvent.Register(ShowGameTipsPanel);
+                GamePlayingEvent.Register(() =>
+                {
+                    StartCoroutine(CountDownTimeRemaining());
+                    InvokeRepeating(nameof(GenerateGopher), 0, 0.5f);
+                });
+                GopherRecycleEvent.Register((gopher) => _gopherPool.Recycle(gopher));
+
+                var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
+
+                playButton.GetComponent<Button>().onClick.AddListener((() =>
+                {
+                    var gameStartPanel = playButton.transform.parent.gameObject;
+                    gameStartPanel.SetActive(false);
+
+                    GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
+                }));
+
+                gamePlayUI.UpdateScore(playerData.GetScore());
+                gamePlayUI.UpdateTimeRemaining((int) _timer);
+                gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
             }
             catch (Exception e)
             {
@@ -64,30 +85,6 @@ namespace GameScene.GamePlayScene
             }
         }
 
-        private void BindUI()
-        {
-            gamePlayUI.UpdateScore(playerData.GetScore());
-            gamePlayUI.UpdateTimeRemaining((int) _timer);
-            gamePlayUI.UpdateOpportunity(playerData.GetOpportunity());
-
-            ScoreCalculationEvent.Register(UpdateScore);
-            GameStartReadyEvent.Register(ShowGameReadyMusic);
-            GameOpportunityEvent.Register(UpdateOpportunity);
-            GamePauseEvent.Register(ShowGameTipsPanel);
-            GamePlayingEvent.Register(() => StartCoroutine(CountDownTimeRemaining()));
-            GopherRecycleEvent.Register((gopher) => _gopherPool.Recycle(gopher));
-
-            var playButton = GetChildByName(gamePlayUI.gameObject, "Button_Play");
-
-            playButton.GetComponent<Button>().onClick.AddListener((() =>
-            {
-                var gameStartPanel = playButton.transform.parent.gameObject;
-                gameStartPanel.SetActive(false);
-
-                GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
-                InvokeRepeating(nameof(GenerateGopher), 0, 0.5f);
-            }));
-        }
 
         private PlayerData GetGameModelData()
         {
@@ -145,16 +142,7 @@ namespace GameScene.GamePlayScene
             }
 
             _timer = 0;
-
-            var gophers = GetGophers();
-
-            foreach (var gopher in gophers)
-            {
-                gopher.UnEnabledTapped();
-            }
         }
-
-        private GopherController[] GetGophers() => FindObjectsOfType<GopherController>();
 
         public void GenerateGopher()
         {
@@ -206,7 +194,6 @@ namespace GameScene.GamePlayScene
             var exitButton = GetChildByName(gameTipsPanel, "Button_Exit");
             var continueButton = GetChildByName(gameTipsPanel, "Button_Continue");
 
-
             exitButton.GetComponent<Button>().onClick.AddListener(ExitGame);
             continueButton.GetComponent<Button>().onClick.AddListener(ContinueGame);
         }
@@ -255,15 +242,6 @@ namespace GameScene.GamePlayScene
             _timer = timeRemaining;
             StopAllCoroutines();
             GameSystem.Instance.UpdateGameState(GameState.GamePlaying);
-
-            InvokeRepeating(nameof(GenerateGopher), 0, 3);
-
-            var gophers = GetGophers();
-
-            foreach (var gopher in gophers)
-            {
-                gopher.EnabledTapped();
-            }
         }
 
         private void SaveData()

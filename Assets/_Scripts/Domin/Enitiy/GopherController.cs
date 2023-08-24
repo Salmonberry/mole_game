@@ -36,25 +36,5 @@ namespace Domin.Enitiy
         }
 
         private Animator GetAnimator() => _animator ? _animator : (_animator = GetComponent<Animator>());
-
-        public void UnEnabledTapped()
-        {
-            var boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
-
-            if (boxCollider2D != null)
-            {
-                boxCollider2D.enabled = false;
-            }
-        }
-
-        public void EnabledTapped()
-        {
-            var boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
-
-            if (boxCollider2D != null)
-            {
-                boxCollider2D.enabled = true;
-            }
-        }
     }
 }
