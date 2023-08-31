@@ -3,7 +3,7 @@ using Domin.Enitiy;
 
 namespace Domin.Event
 {
-    public static class GopherRecycleEvent
+    public  class GopherRecycleEvent
     {
         private static Action<GopherController> _mOnEventTrigger;
 

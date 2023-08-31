@@ -33,6 +33,8 @@ namespace GameScene.GamePlayScene
         private float _timer;
         private ObjectPool<GopherController> _gopherPool;
 
+        [FormerlySerializedAs("timeScale")] public float moleAppearRate;
+
         private void Awake()
         {
             audioSource = GetComponent<AudioSource>();
@@ -60,7 +62,7 @@ namespace GameScene.GamePlayScene
                 GamePlayingEvent.Register(() =>
                 {
                     StartCoroutine(CountDownTimeRemaining());
-                    InvokeRepeating(nameof(GenerateGopher), 0, 0.5f);
+                        InvokeRepeating(nameof(GenerateGopher), 0, moleAppearRate);
                 });
                 GopherRecycleEvent.Register((gopher) => _gopherPool.Recycle(gopher));
 
@@ -84,7 +86,6 @@ namespace GameScene.GamePlayScene
                 throw;
             }
         }
-
 
         private PlayerData GetGameModelData()
         {

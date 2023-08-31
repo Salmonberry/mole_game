@@ -2,25 +2,7 @@
 
 namespace Domin.Event
 {
-    public static class GamePauseEvent
+    public class GamePauseEvent : Event<GamePauseEvent>
     {
-        private static Action mOnEventTrigger;
-
-
-        public static void Register(Action action)
-        {
-            mOnEventTrigger += action;
-        }
-
-
-        public static void Unregister(Action action)
-        {
-            mOnEventTrigger -= action;
-        }
-
-        public static void Trigger()
-        {
-            mOnEventTrigger?.Invoke();
-        }
     }
 }
