@@ -9,23 +9,11 @@ namespace Model
     [Serializable]
     public class GameModelManager : MonoBehaviour
     {
-        public PlayerData playerData;
-        public PlayerData LoadData(String key)
-        {
-            if (PlayerPrefs.HasKey(key))
-            {
-                playerData = JsonUtility.FromJson<PlayerData>(PlayerPrefs.GetString(key));
+        public PlayerData LoadData(String key) => PlayerPrefs.HasKey(key)
+            ? JsonUtility.FromJson<PlayerData>(PlayerPrefs.GetString(key))
+            : new PlayerData();
 
-                return playerData;
-            }
-            else
-            {
-                playerData = new PlayerData();
-
-                return playerData;
-            }
-        }
-
-        public void SaveData(Dictionary<String,PlayerData> data) => PlayerPrefs.SetString(data.First().Key, JsonUtility.ToJson(data.First().Value));
+        public void SaveData(Dictionary<String, PlayerData> data) =>
+            PlayerPrefs.SetString(data.First().Key, JsonUtility.ToJson(data.First().Value));
     }
 }

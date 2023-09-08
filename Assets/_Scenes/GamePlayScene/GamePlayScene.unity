@@ -3750,11 +3750,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosion: {fileID: 8574727582542113695, guid: 083632c639ef2db4f83f30b2b8d608d1, type: 3}
-  gameStartReadyVoiceEffect: {fileID: 8300000, guid: d616eb9dd5ba66042a62f079596b6cd0, type: 3}
+  gameStartReadyVoiceEffect: {fileID: 8300000, guid: 7ea276bfca27fdc428594f0c3baeabe9, type: 3}
   audioSource: {fileID: 0}
   gameTipsPanel: {fileID: 1284782935}
   gameEndPanel: {fileID: 88752559}
-  timeRemaining: 60
+  timeRemaining: 30
   playerData:
     _score: 0
     _opportunity: 3
@@ -3773,7 +3773,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.033
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -4341,7 +4341,7 @@ Transform:
   m_GameObject: {fileID: 2115014499}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.24807557, y: -0.9448993, z: -0.016126437}
+  m_LocalPosition: {x: -0.24807557, y: -1.76, z: -0.016126437}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

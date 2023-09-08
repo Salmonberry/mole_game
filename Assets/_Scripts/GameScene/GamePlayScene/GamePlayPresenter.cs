@@ -62,7 +62,7 @@ namespace GameScene.GamePlayScene
                 GamePlayingEvent.Register(() =>
                 {
                     StartCoroutine(CountDownTimeRemaining());
-                        InvokeRepeating(nameof(GenerateGopher), 0, moleAppearRate);
+                    InvokeRepeating(nameof(GenerateGopher), 0, moleAppearRate);
                 });
                 GopherRecycleEvent.Register((gopher) => _gopherPool.Recycle(gopher));
 
@@ -223,8 +223,9 @@ namespace GameScene.GamePlayScene
         // exit the game
         private void ExitGame()
         {
-            playerData.ReSetOpportunity();
+            ResetData();
             SaveData();
+
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #else
@@ -249,6 +250,12 @@ namespace GameScene.GamePlayScene
         {
             Dictionary<string, PlayerData> dictionary = new Dictionary<string, PlayerData> {{"PlayerData", playerData}};
             _gameModelManager.SaveData(dictionary);
+        }
+
+        private void ResetData()
+        {
+            playerData.ReSetOpportunity();
+            playerData.ReSetScore();
         }
     }
 }

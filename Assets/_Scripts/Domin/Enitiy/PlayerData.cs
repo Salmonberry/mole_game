@@ -1,37 +1,43 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Domin.Enitiy
 {
     [Serializable]
     public class PlayerData
     {
-        [SerializeField] private int _score = 0;
-        [SerializeField] private int _opportunity = 3;
+        [SerializeField] private int score = 0;
+        [SerializeField] private int opportunity = 3;
 
         public void UpdateScore(int score)
         {
-            _score += score;
+            this.score += score;
         }
 
         public void UpdateOpportunity(int opportunity)
         {
-            _opportunity -= opportunity;
+            this.opportunity -= opportunity;
         }
 
         public void ReSetOpportunity()
         {
-            _opportunity = default(int);
+            opportunity = 3;
+        }
+
+        public void ReSetScore()
+        {
+            score = 0;
         }
 
         public int GetScore()
         {
-            return _score;
+            return score;
         }
 
         public int GetOpportunity()
         {
-            return _opportunity;
+            return opportunity;
         }
     }
 }
